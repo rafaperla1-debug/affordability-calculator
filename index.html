@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free home affordability calculator. Find out how much house you can afford based on your income, debts, and down payment.">
+  <title>How Much House Can I Afford? — Free Calculator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f0; color: #1a1a18; min-height: 100vh; }
+    header { background: #fff; border-bottom: 1px solid #e5e5e0; padding: 16px 24px; }
+    header h1 { font-size: 18px; font-weight: 600; color: #1a1a18; }
+    header p { font-size: 13px; color: #6b6b65; margin-top: 2px; }
+    .container { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+    .intro { margin-bottom: 24px; }
+    .intro h2 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+    .intro p { font-size: 14px; color: #6b6b65; line-height: 1.6; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: #fff; border: 1px solid #e5e5e0; border-radius: 12px; padding: 20px; }
+    .card-title { font-size: 12px; font-weight: 600; color: #6b6b65; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 16px; }
+    .field { margin-bottom: 18px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #4a4a46; margin-bottom: 6px; }
+    .field label .val { font-weight: 600; color: #1a1a18; }
+    input[type=range] { width: 100%; accent-color: #185FA5; height: 4px; cursor: pointer; }
+    .results { background: #fff; border: 1px solid #e5e5e0; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .results-title { font-size: 12px; font-weight: 600; color: #6b6b65; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 16px; }
+    .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .metric { background: #f5f5f0; border-radius: 8px; padding: 14px; }
+    .metric.blue { background: #E6F1FB; }
+    .metric .mlabel { font-size: 12px; color: #6b6b65; margin-bottom: 4px; }
+    .metric.blue .mlabel { color: #185FA5; }
+    .metric .mval { font-size: 22px; font-weight: 600; color: #1a1a18; }
+    .metric.blue .mval { color: #0C447C; }
+    .breakdown { border-top: 1px solid #e5e5e0; padding-top: 14px; }
+    .brow { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; border-bottom: 1px solid #f0f0ec; }
+    .brow:last-child { border-bottom: none; font-weight: 600; font-size: 15px; }
+    .brow span:first-child { color: #6b6b65; }
+    .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 99px; margin: 12px 0 8px; }
+    .tag-green { background: #EAF3DE; color: #3B6D11; }
+    .tag-amber { background: #FAEEDA; color: #854F0B; }
+    .tag-red { background: #FCEBEB; color: #A32D2D; }
+    .tip { font-size: 13px; color: #6b6b65; line-height: 1.6; background: #f5f5f0; border-radius: 8px; padding: 12px; }
+    .full { grid-column: 1 / -1; }
+    footer { text-align: center; font-size: 12px; color: #9a9a94; margin-top: 40px; padding: 0 16px; }
+    footer a { color: #185FA5; text-decoration: none; }
+    h3.section-label { font-size: 14px; font-weight: 600; color: #1a1a18; margin: 24px 0 12px; }
+    .faq { background: #fff; border: 1px solid #e5e5e0; border-radius: 12px; padding: 20px; margin-bottom: 12px; }
+    .faq h4 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+    .faq p { font-size: 14px; color: #4a4a46; line-height: 1.7; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Home Affordability Calculator</h1>
+  <p>Free tool — no sign-up required</p>
+</header>
+
+<div class="container">
+  <div class="intro">
+    <h2>How much house can you afford?</h2>
+    <p>Use the sliders below to estimate your maximum home purchase price based on your income, debts, down payment, and current interest rates.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">Income & debts</div>
+      <div class="field">
+        <label>Annual gross income <span class="val" id="lbl-income">$75,000</span></label>
+        <input type="range" id="income" min="20000" max="300000" step="1000" value="75000" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Monthly debt payments <span class="val" id="lbl-debt">$300/mo</span></label>
+        <input type="range" id="debt" min="0" max="3000" step="50" value="300" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Loan details</div>
+      <div class="field">
+        <label>Down payment <span class="val" id="lbl-down">$15,000</span></label>
+        <input type="range" id="down" min="0" max="200000" step="500" value="15000" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Interest rate <span class="val" id="lbl-rate">6.8%</span></label>
+        <input type="range" id="rate" min="2" max="14" step="0.1" value="6.8" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Loan term <span class="val" id="lbl-term">30 years</span></label>
+        <input type="range" id="term" min="5" max="30" step="5" value="30" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Additional costs</div>
+      <div class="field">
+        <label>Annual property tax rate <span class="val" id="lbl-tax">1.2%</span></label>
+        <input type="range" id="tax" min="0.2" max="3" step="0.1" value="1.2" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Monthly home insurance <span class="val" id="lbl-ins">$100/mo</span></label>
+        <input type="range" id="ins" min="30" max="500" step="10" value="100" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="results">
+      <div class="results-title">Your results</div>
+      <div class="metrics">
+        <div class="metric blue">
+          <div class="mlabel">Max home price</div>
+          <div class="mval" id="r-price">$0</div>
+        </div>
+        <div class="metric blue">
+          <div class="mlabel">Max loan amount</div>
+          <div class="mval" id="r-loan">$0</div>
+        </div>
+        <div class="metric">
+          <div class="mlabel">Monthly payment</div>
+          <div class="mval" id="r-payment">$0</div>
+        </div>
+        <div class="metric">
+          <div class="mlabel">Debt-to-income ratio</div>
+          <div class="mval" id="r-dti">0%</div>
+        </div>
+      </div>
+      <div class="breakdown">
+        <div class="brow"><span>Principal & interest</span><span id="b-pi">$0</span></div>
+        <div class="brow"><span>Property tax</span><span id="b-tax">$0</span></div>
+        <div class="brow"><span>Home insurance</span><span id="b-ins">$0</span></div>
+        <div class="brow"><span>Total monthly payment</span><span id="b-total">$0</span></div>
+      </div>
+      <div id="status-tag"></div>
+      <div class="tip" id="tip-text"></div>
+    </div>
+  </div>
+
+  <h3 class="section-label">Frequently asked questions</h3>
+
+  <div class="faq">
+    <h4>What is the 28/36 rule?</h4>
+    <p>The 28/36 rule is a guideline used by lenders: your housing payment should not exceed 28% of your gross monthly income, and your total debt payments (including housing) should not exceed 36%. Staying within these limits gives you the best chance of loan approval at competitive rates.</p>
+  </div>
+
+  <div class="faq">
+    <h4>What counts as monthly debt?</h4>
+    <p>Monthly debt includes credit card minimum payments, car loans, student loans, personal loans, and any other recurring debt obligations. It does not include utilities, groceries, or subscriptions. Lenders add your estimated housing payment to these existing debts to calculate your total debt-to-income ratio.</p>
+  </div>
+
+  <div class="faq">
+    <h4>How much should I put as a down payment?</h4>
+    <p>A 20% down payment is the traditional benchmark because it eliminates Private Mortgage Insurance (PMI), which adds $50–$200/month to your payment. However, many loan programs allow 3–5% down. A larger down payment lowers your monthly payment and improves your approval odds.</p>
+  </div>
+
+  <div class="faq">
+    <h4>Does this calculator include PMI?</h4>
+    <p>This calculator does not include PMI. If your down payment is less than 20% of the home price, most lenders will require PMI, which typically costs 0.5%–1.5% of the loan amount per year. Add $50–$200 to your estimated monthly payment if your down payment is below 20%.</p>
+  </div>
+
+  <div class="faq">
+    <h4>What credit score do I need to buy a house?</h4>
+    <p>Most conventional loans require a minimum credit score of 620. FHA loans can go as low as 580 with a 3.5% down payment. The higher your credit score, the better your interest rate — which directly affects how much house you can afford. A difference of just 1% in rate can change your buying power by tens of thousands of dollars.</p>
+  </div>
+
+  <footer>
+    <p>This calculator provides estimates for educational purposes only and does not constitute financial advice. Consult a licensed mortgage professional before making any home purchase decision.</p>
+    <p style="margin-top:8px">© 2025 Home Affordability Calculator</p>
+  </footer>
+</div>
+
+<script>
+  function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  function calc() {
+    const income = +document.getElementById('income').value;
+    const debt   = +document.getElementById('debt').value;
+    const down   = +document.getElementById('down').value;
+    const rate   = +document.getElementById('rate').value;
+    const term   = +document.getElementById('term').value;
+    const taxRate= +document.getElementById('tax').value;
+    const ins    = +document.getElementById('ins').value;
+
+    document.getElementById('lbl-income').textContent = fmt(income);
+    document.getElementById('lbl-debt').textContent   = fmt(debt) + '/mo';
+    document.getElementById('lbl-down').textContent   = fmt(down);
+    document.getElementById('lbl-rate').textContent   = rate.toFixed(1) + '%';
+    document.getElementById('lbl-term').textContent   = term + ' years';
+    document.getElementById('lbl-tax').textContent    = taxRate.toFixed(1) + '%';
+    document.getElementById('lbl-ins').textContent    = fmt(ins) + '/mo';
+
+    const monthlyIncome = income / 12;
+    const maxTotalPayment = monthlyIncome * 0.43 - debt;
+
+    const r = rate / 100 / 12;
+    const n = term * 12;
+
+    function piFromLoan(loan) {
+      if (r === 0) return loan / n;
+      return loan * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    }
+
+    let lo = 0, hi = 5000000, loanAmt = 0;
+    for (let i = 0; i < 60; i++) {
+      const mid = (lo + hi) / 2;
+      const pi = piFromLoan(mid);
+      const totalTax = mid * taxRate / 100 / 12;
+      const total = pi + totalTax + ins;
+      if (total <= maxTotalPayment) { lo = mid; loanAmt = mid; } else { hi = mid; }
+    }
+
+    const homePrice     = loanAmt + down;
+    const pi            = piFromLoan(loanAmt);
+    const monthlyTax    = homePrice * taxRate / 100 / 12;
+    const totalPayment  = pi + monthlyTax + ins;
+    const dti           = (totalPayment + debt) / monthlyIncome * 100;
+
+    document.getElementById('r-price').textContent   = fmt(homePrice);
+    document.getElementById('r-loan').textContent    = fmt(loanAmt);
+    document.getElementById('r-payment').textContent = fmt(totalPayment) + '/mo';
+    document.getElementById('r-dti').textContent     = Math.round(dti) + '%';
+    document.getElementById('b-pi').textContent      = fmt(pi);
+    document.getElementById('b-tax').textContent     = fmt(monthlyTax);
+    document.getElementById('b-ins').textContent     = fmt(ins);
+    document.getElementById('b-total').textContent   = fmt(totalPayment);
+
+    const tag = document.getElementById('status-tag');
+    const tip = document.getElementById('tip-text');
+
+    if (dti <= 36) {
+      tag.innerHTML = '<span class="tag tag-green">Excellent — DTI below 36%</span>';
+      tip.textContent = 'Your debt-to-income ratio is in great shape. Most lenders will be comfortable approving a loan at these numbers.';
+    } else if (dti <= 43) {
+      tag.innerHTML = '<span class="tag tag-amber">Acceptable — DTI between 36–43%</span>';
+      tip.textContent = 'Your DTI is within the acceptable range for most conventional loans, but reducing monthly debts before applying will improve your terms.';
+    } else {
+      tag.innerHTML = '<span class="tag tag-red">Tight — DTI above 43%</span>';
+      tip.textContent = 'Most lenders cap DTI at 43%. Consider increasing your down payment, reducing existing debts, or looking at a lower price range.';
+    }
+  }
+
+  calc();
+</script>
+</body>
+</html>
