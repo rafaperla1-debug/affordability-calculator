@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free savings goal calculator. Find out how much you need to save each month to reach any financial goal — vacation, down payment, emergency fund, or anything else.">
+  <title>Savings Goal Calculator — How Long to Reach Your Goal?</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f0; color: #1a1a18; min-height: 100vh; }
+    header { background: #fff; border-bottom: 1px solid #e5e5e0; padding: 16px 24px; }
+    header h1 { font-size: 18px; font-weight: 600; }
+    header p { font-size: 13px; color: #6b6b65; margin-top: 2px; }
+    .container { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+    .intro h2 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+    .intro p { font-size: 14px; color: #6b6b65; line-height: 1.6; margin-bottom: 24px; }
+    .card { background: #fff; border: 1px solid #e5e5e0; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .card-title { font-size: 12px; font-weight: 600; color: #6b6b65; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 16px; }
+    .field { margin-bottom: 18px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { display: flex; justify-content: space-between; font-size: 14px; color: #4a4a46; margin-bottom: 6px; }
+    .field label .val { font-weight: 600; color: #1a1a18; }
+    input[type=range] { width: 100%; accent-color: #185FA5; cursor: pointer; }
+    .goal-presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 0; }
+    @media(max-width:500px) { .goal-presets { grid-template-columns: repeat(2,1fr); } }
+    .preset-btn { border: 1px solid #e5e5e0; border-radius: 8px; padding: 10px 6px; background: #fff; cursor: pointer; text-align: center; font-size: 12px; color: #4a4a46; transition: all .15s; }
+    .preset-btn:hover { border-color: #185FA5; color: #185FA5; }
+    .preset-btn.active { border-color: #185FA5; background: #E6F1FB; color: #0C447C; font-weight: 600; }
+    .preset-btn .icon { font-size: 18px; display: block; margin-bottom: 4px; }
+    .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+    .metric { background: #f5f5f0; border-radius: 8px; padding: 14px; }
+    .metric.blue { background: #E6F1FB; }
+    .metric.green { background: #EAF3DE; }
+    .metric .mlabel { font-size: 12px; color: #6b6b65; margin-bottom: 4px; }
+    .metric.blue .mlabel { color: #185FA5; }
+    .metric.green .mlabel { color: #3B6D11; }
+    .metric .mval { font-size: 22px; font-weight: 600; color: #1a1a18; }
+    .metric.blue .mval { color: #0C447C; }
+    .metric.green .mval { color: #27500A; }
+    .progress-bar { background: #f5f5f0; border-radius: 99px; height: 10px; margin: 10px 0 6px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; background: #185FA5; transition: width .4s; }
+    .progress-fill.done { background: #3B6D11; }
+    .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 99px; margin: 10px 0 8px; }
+    .tag-green { background: #EAF3DE; color: #3B6D11; }
+    .tag-amber { background: #FAEEDA; color: #854F0B; }
+    .tag-blue { background: #E6F1FB; color: #185FA5; }
+    .tip { font-size: 13px; color: #6b6b65; line-height: 1.6; background: #f5f5f0; border-radius: 8px; padding: 12px; margin-top: 8px; }
+    .timeline { margin-top: 16px; border-top: 1px solid #e5e5e0; padding-top: 16px; }
+    .timeline-title { font-size: 12px; font-weight: 600; color: #6b6b65; text-transform: uppercase; letter-spacing:.07em; margin-bottom: 12px; }
+    .milestones { display: flex; flex-direction: column; gap: 8px; }
+    .milestone { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+    .milestone .dot { width: 10px; height: 10px; border-radius: 50%; background: #e5e5e0; flex-shrink: 0; }
+    .milestone .dot.reached { background: #3B6D11; }
+    .milestone .dot.next { background: #185FA5; }
+    .milestone .mdate { color: #6b6b65; min-width: 80px; }
+    .milestone .mamt { font-weight: 600; color: #1a1a18; min-width: 80px; }
+    .milestone .mpct { color: #9a9a94; font-size: 12px; }
+    .brow { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; border-bottom: 1px solid #f0f0ec; }
+    .brow:last-child { border-bottom: none; font-weight: 600; }
+    .brow span:first-child { color: #6b6b65; }
+    .faq { background: #fff; border: 1px solid #e5e5e0; border-radius: 12px; padding: 20px; margin-bottom: 12px; }
+    .faq h4 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+    .faq p { font-size: 14px; color: #4a4a46; line-height: 1.7; }
+    h3.section-label { font-size: 14px; font-weight: 600; margin: 24px 0 12px; }
+    footer { text-align: center; font-size: 12px; color: #9a9a94; margin-top: 40px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width:600px) { .grid2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Savings Goal Calculator</h1>
+  <p>Free tool — no sign-up required</p>
+</header>
+
+<div class="container">
+  <div class="intro">
+    <h2>How long will it take to reach your savings goal?</h2>
+    <p>Enter your goal, what you already have saved, and how much you can set aside each month. We'll tell you exactly when you'll get there.</p>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <div class="card">
+        <div class="card-title">What are you saving for?</div>
+        <div class="goal-presets">
+          <button class="preset-btn" onclick="setGoal(5000, this)">
+            <span class="icon">🚗</span>Car fund
+          </button>
+          <button class="preset-btn active" onclick="setGoal(20000, this)">
+            <span class="icon">🏠</span>Down payment
+          </button>
+          <button class="preset-btn" onclick="setGoal(3000, this)">
+            <span class="icon">✈️</span>Vacation
+          </button>
+          <button class="preset-btn" onclick="setGoal(10000, this)">
+            <span class="icon">🛡️</span>Emergency fund
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Your goal details</div>
+        <div class="field">
+          <label>Savings goal <span class="val" id="lbl-goal">$20,000</span></label>
+          <input type="range" id="goal" min="500" max="200000" step="500" value="20000" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Already saved <span class="val" id="lbl-saved">$2,000</span></label>
+          <input type="range" id="saved" min="0" max="100000" step="100" value="2000" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Monthly savings amount <span class="val" id="lbl-monthly">$400</span></label>
+          <input type="range" id="monthly" min="25" max="5000" step="25" value="400" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Annual interest rate (HYSA) <span class="val" id="lbl-rate">4.5%</span></label>
+          <input type="range" id="rate" min="0" max="8" step="0.1" value="4.5" oninput="calc()">
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-title">Your results</div>
+        <div class="metrics">
+          <div class="metric blue">
+            <div class="mlabel">Goal reached by</div>
+            <div class="mval" id="r-date">—</div>
+          </div>
+          <div class="metric blue">
+            <div class="mlabel">Months to goal</div>
+            <div class="mval" id="r-months">—</div>
+          </div>
+          <div class="metric green">
+            <div class="mlabel">Total saved</div>
+            <div class="mval" id="r-total">$0</div>
+          </div>
+          <div class="metric green">
+            <div class="mlabel">Interest earned</div>
+            <div class="mval" id="r-interest">$0</div>
+          </div>
+        </div>
+
+        <div style="font-size:13px;color:#6b6b65;margin-bottom:4px">Current progress</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#9a9a94;margin-bottom:12px">
+          <span id="pct-label">0% saved</span>
+          <span id="r-remaining">$0 to go</span>
+        </div>
+
+        <div class="brow"><span>Savings goal</span><span id="b-goal">$0</span></div>
+        <div class="brow"><span>Already saved</span><span id="b-saved">$0</span></div>
+        <div class="brow"><span>Monthly contribution</span><span id="b-monthly">$0</span></div>
+        <div class="brow"><span>Interest earned</span><span id="b-interest">$0</span></div>
+        <div class="brow"><span>Months to goal</span><span id="b-months">—</span></div>
+
+        <div id="status-tag"></div>
+        <div class="tip" id="tip-text"></div>
+
+        <div class="timeline">
+          <div class="timeline-title">Milestones</div>
+          <div class="milestones" id="milestones"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="section-label">Frequently asked questions</h3>
+
+  <div class="faq">
+    <h4>Where should I keep my savings while working toward a goal?</h4>
+    <p>For goals 1–5 years away, a high-yield savings account (HYSA) is ideal — FDIC insured, liquid, and currently earning 4–5% APY. For goals 5+ years away, consider a mix of HYSA and low-risk index funds. Never put short-term savings in the stock market — a market drop right before you need the money could derail your plan.</p>
+  </div>
+
+  <div class="faq">
+    <h4>Does the interest rate really make a difference?</h4>
+    <p>Yes, especially over longer time frames. At 4.5% APY, $400/month saved over 3 years earns roughly $900 in interest — effectively a free month of savings. At 0.01% (standard checking account), you earn almost nothing. Moving your savings to a high-yield account is one of the easiest financial wins available right now.</p>
+  </div>
+
+  <div class="faq">
+    <h4>What if I can increase my monthly savings later?</h4>
+    <p>Even small increases make a big difference. Adding $50/month to a $400 contribution shortens a 3-year goal by nearly 2 months. The best strategy is to automate your savings at your current comfortable level, then increase the amount by 10–20% each time you get a raise or pay off a debt.</p>
+  </div>
+
+  <div class="faq">
+    <h4>Should I save for a goal while also paying off debt?</h4>
+    <p>It depends on the interest rate. If your debt carries a rate higher than your savings yield (e.g., credit card at 20% vs. HYSA at 4.5%), pay off the debt first — you're mathematically losing money otherwise. However, always keep a small starter emergency fund of $500–$1,000 before aggressively paying down debt, so one setback doesn't send you back to square one.</p>
+  </div>
+
+  <footer>
+    <p>This calculator provides estimates for educational purposes only and does not constitute financial advice.</p>
+    <p style="margin-top:8px">© 2025 Personal Finance Calculators</p>
+  </footer>
+</div>
+
+<script>
+  function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  function setGoal(amount, btn) {
+    document.getElementById('goal').value = amount;
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    calc();
+  }
+
+  function calc() {
+    const goal    = +document.getElementById('goal').value;
+    const saved   = +document.getElementById('saved').value;
+    const monthly = +document.getElementById('monthly').value;
+    const rate    = +document.getElementById('rate').value;
+
+    document.getElementById('lbl-goal').textContent    = fmt(goal);
+    document.getElementById('lbl-saved').textContent   = fmt(saved);
+    document.getElementById('lbl-monthly').textContent = fmt(monthly) + '/mo';
+    document.getElementById('lbl-rate').textContent    = rate.toFixed(1) + '%';
+
+    const monthlyRate = rate / 100 / 12;
+    let balance = saved;
+    let months = 0;
+    let totalInterest = 0;
+
+    while (balance < goal && months < 600) {
+      const interest = balance * monthlyRate;
+      totalInterest += interest;
+      balance += interest + monthly;
+      months++;
+    }
+
+    const pct = Math.min(100, Math.round(saved / goal * 100));
+    const remaining = Math.max(0, goal - saved);
+
+    const targetDate = new Date();
+    targetDate.setMonth(targetDate.getMonth() + months);
+    const dateStr = targetDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+    document.getElementById('r-date').textContent     = months < 600 ? dateStr : '50+ yrs';
+    document.getElementById('r-months').textContent   = months < 600 ? months + ' mo' : '—';
+    document.getElementById('r-total').textContent    = fmt(goal);
+    document.getElementById('r-interest').textContent = fmt(totalInterest);
+    document.getElementById('pct-label').textContent  = pct + '% saved';
+    document.getElementById('r-remaining').textContent = fmt(remaining) + ' to go';
+
+    const fill = document.getElementById('progress');
+    fill.style.width = pct + '%';
+    fill.className = 'progress-fill' + (pct >= 100 ? ' done' : '');
+
+    document.getElementById('b-goal').textContent     = fmt(goal);
+    document.getElementById('b-saved').textContent    = fmt(saved);
+    document.getElementById('b-monthly').textContent  = fmt(monthly) + '/mo';
+    document.getElementById('b-interest').textContent = fmt(totalInterest);
+    document.getElementById('b-months').textContent   = months < 600 ? months + ' months' : '—';
+
+    const tag = document.getElementById('status-tag');
+    const tip = document.getElementById('tip-text');
+
+    if (pct >= 100) {
+      tag.innerHTML = '<span class="tag tag-green">Goal already reached!</span>';
+      tip.textContent = 'You\'ve already hit your target. Consider moving to a high-yield savings account to protect and grow what you\'ve built.';
+    } else if (months <= 12) {
+      tag.innerHTML = '<span class="tag tag-green">Almost there — under 1 year</span>';
+      tip.textContent = 'You\'re very close. Stay consistent and you\'ll reach your goal within the year. Automate your monthly transfer so you never miss a contribution.';
+    } else if (months <= 36) {
+      tag.innerHTML = '<span class="tag tag-blue">On track — 1 to 3 years</span>';
+      tip.textContent = 'A solid, achievable timeline. Put your savings in a high-yield savings account to earn interest while you work toward your goal.';
+    } else {
+      tag.innerHTML = '<span class="tag tag-amber">Long-term goal — consider saving more</span>';
+      tip.textContent = 'This goal will take a while at your current pace. Even an extra $50/month can shave months off your timeline. Look for small budget cuts to boost your monthly contribution.';
+    }
+
+    const milestoneContainer = document.getElementById('milestones');
+    milestoneContainer.innerHTML = '';
+    const checkpoints = [0.25, 0.5, 0.75, 1.0];
+    checkpoints.forEach(cp => {
+      let bal2 = saved;
+      let m2 = 0;
+      while (bal2 < goal * cp && m2 < 600) {
+        bal2 += bal2 * monthlyRate + monthly;
+        m2++;
+      }
+      const d = new Date();
+      d.setMonth(d.getMonth() + m2);
+      const dStr = m2 === 0 ? 'Now' : d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      const reached = saved >= goal * cp;
+      const isNext = !reached && checkpoints.slice(0, checkpoints.indexOf(cp)).every(c => saved >= goal * c);
+      const div = document.createElement('div');
+      div.className = 'milestone';
+      div.innerHTML = `
+        <div class="dot ${reached ? 'reached' : isNext ? 'next' : ''}"></div>
+        <span class="mdate">${dStr}</span>
+        <span class="mamt">${fmt(goal * cp)}</span>
+        <span class="mpct">${Math.round(cp * 100)}% of goal</span>
+      `;
+      milestoneContainer.appendChild(div);
+    });
+  }
+
+  calc();
+</script>
+</body>
+</html>
