@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free emergency fund calculator. Find out exactly how much you need to save and how long it will take based on your expenses and lifestyle.">
+  <title>Emergency Fund Calculator — How Much Do You Need?</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f0; color: #1a1a18; min-height: 100vh; }
+    header { background: #fff; border-bottom: 1px solid #e5e5e0; padding: 16px 24px; }
+    header h1 { font-size: 18px; font-weight: 600; color: #1a1a18; }
+    header p { font-size: 13px; color: #6b6b65; margin-top: 2px; }
+    .container { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+    .intro { margin-bottom: 24px; }
+    .intro h2 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+    .intro p { font-size: 14px; color: #6b6b65; line-height: 1.6; }
+    .card { background: #fff; border: 1px solid #e5e5e0; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .card-title { font-size: 12px; font-weight: 600; color: #6b6b65; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 16px; }
+    .field { margin-bottom: 18px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #4a4a46; margin-bottom: 6px; }
+    .field label .val { font-weight: 600; color: #1a1a18; }
+    input[type=range] { width: 100%; accent-color: #185FA5; cursor: pointer; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width: 600px) { .grid2 { grid-template-columns: 1fr; } }
+    .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .metric { background: #f5f5f0; border-radius: 8px; padding: 14px; }
+    .metric.blue { background: #E6F1FB; }
+    .metric.green { background: #EAF3DE; }
+    .metric .mlabel { font-size: 12px; color: #6b6b65; margin-bottom: 4px; }
+    .metric.blue .mlabel { color: #185FA5; }
+    .metric.green .mlabel { color: #3B6D11; }
+    .metric .mval { font-size: 22px; font-weight: 600; color: #1a1a18; }
+    .metric.blue .mval { color: #0C447C; }
+    .metric.green .mval { color: #27500A; }
+    .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 0; }
+    .profile-btn { border: 1px solid #e5e5e0; border-radius: 8px; padding: 10px 8px; background: #fff; cursor: pointer; text-align: center; font-size: 13px; color: #4a4a46; transition: all .15s; }
+    .profile-btn:hover { border-color: #185FA5; color: #185FA5; }
+    .profile-btn.active { border-color: #185FA5; background: #E6F1FB; color: #0C447C; font-weight: 600; }
+    .profile-btn .months { font-size: 18px; font-weight: 700; color: #185FA5; display: block; margin-bottom: 2px; }
+    .profile-btn.active .months { color: #0C447C; }
+    .progress-bar { background: #f5f5f0; border-radius: 99px; height: 10px; margin: 10px 0 6px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; background: #185FA5; transition: width .4s; }
+    .progress-fill.full { background: #3B6D11; }
+    .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 99px; margin: 10px 0 8px; }
+    .tag-green { background: #EAF3DE; color: #3B6D11; }
+    .tag-amber { background: #FAEEDA; color: #854F0B; }
+    .tag-red { background: #FCEBEB; color: #A32D2D; }
+    .tip { font-size: 13px; color: #6b6b65; line-height: 1.6; background: #f5f5f0; border-radius: 8px; padding: 12px; margin-top: 8px; }
+    .breakdown { border-top: 1px solid #e5e5e0; padding-top: 14px; margin-top: 4px; }
+    .brow { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; border-bottom: 1px solid #f0f0ec; }
+    .brow:last-child { border-bottom: none; font-weight: 600; }
+    .brow span:first-child { color: #6b6b65; }
+    .faq { background: #fff; border: 1px solid #e5e5e0; border-radius: 12px; padding: 20px; margin-bottom: 12px; }
+    .faq h4 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+    .faq p { font-size: 14px; color: #4a4a46; line-height: 1.7; }
+    h3.section-label { font-size: 14px; font-weight: 600; color: #1a1a18; margin: 24px 0 12px; }
+    .nav-link { display: inline-block; font-size: 13px; color: #185FA5; text-decoration: none; margin-top: 8px; }
+    footer { text-align: center; font-size: 12px; color: #9a9a94; margin-top: 40px; padding: 0 16px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Emergency Fund Calculator</h1>
+  <p>Free tool — no sign-up required</p>
+</header>
+
+<div class="container">
+  <div class="intro">
+    <h2>How much should your emergency fund be?</h2>
+    <p>Enter your monthly expenses and savings situation to get a personalized emergency fund target — and find out exactly how long it will take to get there.</p>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <div class="card">
+        <div class="card-title">Monthly essential expenses</div>
+        <div class="field">
+          <label>Housing (rent/mortgage) <span class="val" id="lbl-housing">$1,200</span></label>
+          <input type="range" id="housing" min="0" max="5000" step="50" value="1200" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Food & groceries <span class="val" id="lbl-food">$400</span></label>
+          <input type="range" id="food" min="0" max="2000" step="25" value="400" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Transportation <span class="val" id="lbl-transport">$300</span></label>
+          <input type="range" id="transport" min="0" max="1500" step="25" value="300" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Utilities & phone <span class="val" id="lbl-utilities">$150</span></label>
+          <input type="range" id="utilities" min="0" max="1000" step="25" value="150" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Insurance <span class="val" id="lbl-insurance">$200</span></label>
+          <input type="range" id="insurance" min="0" max="1000" step="25" value="200" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Minimum debt payments <span class="val" id="lbl-debt">$200</span></label>
+          <input type="range" id="debt" min="0" max="2000" step="25" value="200" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Other essentials <span class="val" id="lbl-other">$100</span></label>
+          <input type="range" id="other" min="0" max="1000" step="25" value="100" oninput="calc()">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Your savings situation</div>
+        <div class="field">
+          <label>Current emergency savings <span class="val" id="lbl-current">$500</span></label>
+          <input type="range" id="current" min="0" max="50000" step="100" value="500" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Monthly amount you can save <span class="val" id="lbl-monthly">$200</span></label>
+          <input type="range" id="monthly" min="0" max="3000" step="25" value="200" oninput="calc()">
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-title">Your situation — choose one</div>
+        <div class="profile-grid">
+          <button class="profile-btn" onclick="setProfile(3, this)">
+            <span class="months">3</span>months<br><small>Stable job, no dependents</small>
+          </button>
+          <button class="profile-btn active" onclick="setProfile(6, this)">
+            <span class="months">6</span>months<br><small>Family or mortgage</small>
+          </button>
+          <button class="profile-btn" onclick="setProfile(9, this)">
+            <span class="months">9</span>months<br><small>Freelance or variable income</small>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Your results</div>
+        <div class="metrics">
+          <div class="metric blue">
+            <div class="mlabel">Target fund</div>
+            <div class="mval" id="r-target">$0</div>
+          </div>
+          <div class="metric blue">
+            <div class="mlabel">Monthly expenses</div>
+            <div class="mval" id="r-monthly">$0</div>
+          </div>
+          <div class="metric green">
+            <div class="mlabel">Still needed</div>
+            <div class="mval" id="r-needed">$0</div>
+          </div>
+          <div class="metric green">
+            <div class="mlabel">Months to goal</div>
+            <div class="mval" id="r-months">—</div>
+          </div>
+        </div>
+
+        <div style="font-size:13px;color:#6b6b65;margin-bottom:4px">Progress toward goal</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#9a9a94">
+          <span id="pct-label">0% funded</span>
+          <span id="r-date">—</span>
+        </div>
+
+        <div class="breakdown">
+          <div class="brow"><span>Monthly essentials</span><span id="b-expenses">$0</span></div>
+          <div class="brow"><span>Coverage target</span><span id="b-months">6 months</span></div>
+          <div class="brow"><span>Target fund</span><span id="b-target">$0</span></div>
+          <div class="brow"><span>Already saved</span><span id="b-current">$0</span></div>
+          <div class="brow"><span>Gap to fill</span><span id="b-gap">$0</span></div>
+        </div>
+
+        <div id="status-tag"></div>
+        <div class="tip" id="tip-text"></div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="section-label">Frequently asked questions</h3>
+
+  <div class="faq">
+    <h4>What counts as an essential expense?</h4>
+    <p>Essential expenses are costs you cannot avoid during a financial emergency: rent or mortgage, groceries, utilities, transportation to work, insurance premiums, and minimum debt payments. Do not include dining out, subscriptions, entertainment, or vacations — those can be cut immediately if needed.</p>
+  </div>
+
+  <div class="faq">
+    <h4>Should I build an emergency fund before paying off debt?</h4>
+    <p>Most financial experts recommend building a small starter emergency fund of $1,000 first, then aggressively paying off high-interest debt, then returning to fully fund your emergency savings. Without any cushion, any unexpected expense will send you back into debt and reset your progress.</p>
+  </div>
+
+  <div class="faq">
+    <h4>Where should I keep my emergency fund?</h4>
+    <p>Keep it in a high-yield savings account (HYSA) at a different bank from your checking account. The separation reduces the temptation to spend it, while still giving you access within 1–2 business days. Never invest your emergency fund in stocks — it could lose 30–50% right when you need it most.</p>
+  </div>
+
+  <div class="faq">
+    <h4>Is 3 months really enough?</h4>
+    <p>In 2025, job searches average 3–6 months for most professionals. Three months is a minimum baseline for people with stable employment and no dependents. If you are a freelancer, single-income household, or have children, aim for 6–9 months. The bigger your financial obligations, the larger your cushion should be.</p>
+  </div>
+
+  <div class="faq">
+    <h4>What if I can only save a small amount each month?</h4>
+    <p>Start anyway. Even $25 per week adds up to $1,300 in a year — enough to handle most common emergencies like a car repair or medical copay. Automating the transfer on payday is the most effective strategy: you never see the money, so you never miss it.</p>
+  </div>
+
+  <footer>
+    <p>This calculator provides estimates for educational purposes only and does not constitute financial advice.</p>
+    <p style="margin-top:8px">© 2025 Personal Finance Calculators</p>
+  </footer>
+</div>
+
+<script>
+  let coverageMonths = 6;
+
+  function setProfile(months, btn) {
+    coverageMonths = months;
+    document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    calc();
+  }
+
+  function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  function calc() {
+    const housing   = +document.getElementById('housing').value;
+    const food      = +document.getElementById('food').value;
+    const transport = +document.getElementById('transport').value;
+    const utilities = +document.getElementById('utilities').value;
+    const insurance = +document.getElementById('insurance').value;
+    const debt      = +document.getElementById('debt').value;
+    const other     = +document.getElementById('other').value;
+    const current   = +document.getElementById('current').value;
+    const monthly   = +document.getElementById('monthly').value;
+
+    document.getElementById('lbl-housing').textContent   = fmt(housing);
+    document.getElementById('lbl-food').textContent      = fmt(food);
+    document.getElementById('lbl-transport').textContent = fmt(transport);
+    document.getElementById('lbl-utilities').textContent = fmt(utilities);
+    document.getElementById('lbl-insurance').textContent = fmt(insurance);
+    document.getElementById('lbl-debt').textContent      = fmt(debt);
+    document.getElementById('lbl-other').textContent     = fmt(other);
+    document.getElementById('lbl-current').textContent   = fmt(current);
+    document.getElementById('lbl-monthly').textContent   = fmt(monthly) + '/mo';
+
+    const totalExpenses = housing + food + transport + utilities + insurance + debt + other;
+    const target = totalExpenses * coverageMonths;
+    const gap = Math.max(0, target - current);
+    const pct = target > 0 ? Math.min(100, Math.round(current / target * 100)) : 0;
+    const monthsToGoal = monthly > 0 ? Math.ceil(gap / monthly) : null;
+
+    document.getElementById('r-target').textContent  = fmt(target);
+    document.getElementById('r-monthly').textContent = fmt(totalExpenses);
+    document.getElementById('r-needed').textContent  = fmt(gap);
+    document.getElementById('r-months').textContent  = monthsToGoal !== null ? monthsToGoal + ' mo' : '—';
+
+    const fill = document.getElementById('progress');
+    fill.style.width = pct + '%';
+    fill.className = 'progress-fill' + (pct >= 100 ? ' full' : '');
+    document.getElementById('pct-label').textContent = pct + '% funded';
+
+    if (monthsToGoal !== null && gap > 0) {
+      const d = new Date();
+      d.setMonth(d.getMonth() + monthsToGoal);
+      document.getElementById('r-date').textContent = 'Done: ' + d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    } else if (gap === 0) {
+      document.getElementById('r-date').textContent = 'Goal reached!';
+    } else {
+      document.getElementById('r-date').textContent = '—';
+    }
+
+    document.getElementById('b-expenses').textContent = fmt(totalExpenses);
+    document.getElementById('b-months').textContent   = coverageMonths + ' months';
+    document.getElementById('b-target').textContent   = fmt(target);
+    document.getElementById('b-current').textContent  = fmt(current);
+    document.getElementById('b-gap').textContent      = fmt(gap);
+
+    const tag = document.getElementById('status-tag');
+    const tip = document.getElementById('tip-text');
+
+    if (pct >= 100) {
+      tag.innerHTML = '<span class="tag tag-green">Fully funded — great work!</span>';
+      tip.textContent = 'Your emergency fund is fully funded. Consider keeping it in a high-yield savings account earning 4–5% APY while you focus on other financial goals.';
+    } else if (pct >= 50) {
+      tag.innerHTML = '<span class="tag tag-amber">Halfway there — keep going</span>';
+      tip.textContent = 'You have a solid base. Automate your monthly savings transfer so it happens on payday — you\'ll reach your goal without thinking about it.';
+    } else if (pct > 0) {
+      tag.innerHTML = '<span class="tag tag-amber">Getting started — every dollar counts</span>';
+      tip.textContent = 'Start by aiming for $1,000 as a first milestone. That alone covers most common emergencies like car repairs or medical copays without going into debt.';
+    } else {
+      tag.innerHTML = '<span class="tag tag-red">No fund yet — start today</span>';
+      tip.textContent = 'Even $25 a week adds up to $1,300 a year. Open a separate savings account today and set up an automatic transfer for whatever amount you can manage right now.';
+    }
+  }
+
+  calc();
+</script>
+</body>
+</html>
